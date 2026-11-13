@@ -1,5 +1,19 @@
 # Development Progress
 
+## Water-Bell Icon
+
+- Reshaped the shared launcher/home mark into a bell while retaining the blue water gradient and highlights; the monochrome notification icon is unchanged.
+- Debug build passed and the updated home mark was inspected on the OnePlus IN2021 (Android 13). The launcher screen itself was not inspected.
+
+## Tone Catalog, Task Transfer, And Appearance
+
+- Added the 20 supplied tones, resampled from 44.1 kHz to 22.05 kHz, alongside the existing catalog. Soft bell, Focus tone, Completion chime, supplied Temple bell, and Aarti bells are protected; deletion of a tone referenced by saved tasks, reminders or defaults is blocked. Bundled deletions hide the resource and do not shrink the APK.
+- Raised own-tone imports to five seconds, keeping the existing 5 MB limit and device-decoder checks.
+- Added individual task sharing and all-task export/import with a versioned ZIP that carries all referenced audio. Import creates new copies; archives have bounded size/counts and reject invalid or missing audio. Room rolls back failed imports.
+- Updated the light/dark palette and adaptive launcher mark to a glossy water drop.
+- Debug and instrumentation APKs build; focused Android tests exercise five-second boundaries, tone deletion, task/audio round-trip, invalid ZIP entries and rollback. Emulator share-sheet controls were checked.
+- Installed the updated app without clearing data on the OnePlus IN2021 (Android 13). All nine focused tone/archive instrumentation tests passed, including all five protected tones, supplied-tone decoding and task/audio round-trip. Checked the 34-tone catalog, five-second import label, dark and light screens, and the task share sheet; restored the original dark setting. Audible playback and delivery through a sharing app were not verified.
+
 ## Home Simplification
 
 - Remove the counter shortcut from Home; retain the existing internal counter implementation without adding another entry point.

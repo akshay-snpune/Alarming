@@ -1,5 +1,11 @@
 # Architecture Proposal
 
+## Task Transfer And Tone Catalog
+
+`TaskArchive` writes a versioned ZIP containing task fields, ordered stages, and bytes for every referenced bundled or imported tone. Sharing uses a scoped FileProvider cache URI; export/import use the Android document picker. Import validates entry paths, counts, sizes, task durations, tone references and device decoding, then creates new private tone copies and tasks inside a Room transaction. Files created before a failed transaction are cleaned up. Limits are 100 tasks, 200 distinct tones, 32 MB expanded and 5 MB/five seconds per audio file. Repeated imports create additional copies. The receiver manually imports with StageBell.
+
+The supplied 20 WAV files are resampled to 22.05 kHz; existing tone IDs are unchanged and supplied IDs are distinct, including the two Temple bells. Five selected tones are protected. Other bundled tones are hidden through DataStore, while imported files are deleted; both are blocked when referenced by stored tasks, reminders or default settings. Hiding bundled resources does not shrink the installed APK. The application uses a calm blue/teal light and dark palette and a glossy water-textured bell adaptive icon.
+
 ## Water And Reminder Update
 
 Room schema version 4 adds `daysOfWeekMask` through migration 3-to-4, preserving previous reminder, tone, and task records. A zero mask retains legacy behavior; new recurring schedules persist explicit Monday-to-Sunday selections. Daily, weekly, and water scheduling honor selected weekdays and the existing DST policy. Valid one-time alarm delivery completes the reminder instead of recomputing a future occurrence.
@@ -39,9 +45,9 @@ Home, Reminders, and Water share the activity's `RemindersViewModel` explicitly.
 
 ## Imported Tones
 
-`audio.ToneLibrary` uses Storage Access Framework `OpenDocument` selection and bounded copies into `files/tones`. Room persists UUID-based IDs, original display names, filenames, and durations. Built-in IDs remain unchanged; imported IDs are stored in the existing reminder sound field. Media metadata, an audio track, and an available decoder are checked before accepting a clip (up to two seconds and 5 MB). Source permissions need not persist after copying.
+`audio.ToneLibrary` uses Storage Access Framework `OpenDocument` selection and bounded copies into `files/tones`. Room persists UUID-based IDs, original display names, filenames, and durations. Built-in IDs remain unchanged; imported IDs are stored in the existing reminder sound field. Media metadata, an audio track, and an available decoder are checked before accepting a clip (up to five seconds and 5 MB). Source permissions need not persist after copying.
 
-Import and deletion of own tones live in the Settings tab; task and reminder pickers only select and preview. Both selectors share MediaPlayer preview controls, releasing the player when the screen exits and resetting it for the next preview. A non-exported FileProvider exposes only the tone directory through scoped URIs for notification sounds. Missing imports resolve to silent notifications and show an unavailable label in the selector. Four JVM import-rule tests and three API 37 import/migration tests verify copy limits, corrupt rejection, URI readability/playback after source removal, and reminder-preserving migration. Real-device notification sound playback is not yet certified.
+Import and deletion of tones live in the Settings tab; task and reminder pickers only select and preview. Both selectors share MediaPlayer preview controls, releasing the player when the screen exits and resetting it for the next preview. A non-exported FileProvider exposes the tone directory and task-export cache through scoped URIs. Missing imports resolve to silent notifications and show an unavailable label in the selector. Real-device notification sound playback is not yet certified.
 
 ## Foreground Timer Cues And Display
 

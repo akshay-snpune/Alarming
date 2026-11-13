@@ -41,14 +41,6 @@ class AppSettingsStore private constructor(context: Context) {
     val hiddenTones: Flow<Set<String>> = store.data.map { it[HIDDEN_TONES] ?: emptySet() }
     suspend fun hideTone(id: String) = store.edit { it[HIDDEN_TONES] = (it[HIDDEN_TONES] ?: emptySet()) + id }
 
-    /** Points any default that uses [toneId] back to the built-in default, e.g. after a tone is deleted. */
-    suspend fun resetDefaultsUsing(toneId: String) = store.edit { prefs ->
-        val fallback = AppSettings()
-        DefaultToneSlot.entries.forEach { slot ->
-            if (prefs[keyFor(slot)] == toneId) prefs[keyFor(slot)] = fallback.tone(slot)
-        }
-    }
-
     private fun toSettings(prefs: Preferences): AppSettings {
         val defaults = AppSettings()
         return AppSettings(

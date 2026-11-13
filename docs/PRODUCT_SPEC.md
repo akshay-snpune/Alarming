@@ -11,6 +11,7 @@ StageBell is a minimalist, offline-first Android productivity tool. Its primary 
 - Native Android behavior, dependable timing, and clear permission explanations.
 - No account, advertisements, analytics, tracking, cloud dependency, or required network access.
 - Restrained, distinctive Material 3 design with deliberate light and dark themes, readable type, generous spacing, and subtle transitions.
+- Use a glossy, water-textured bell for the app icon and home mark; retain the simple monochrome notification bell.
 
 ## Modules
 
@@ -29,7 +30,11 @@ Bundle original two-second tones (soft bell, digital beep, classic tick, double 
 
 The bundled catalog also includes six original feature-phone-style options: Retro dual-tone, Pocket polyphony, Mobile chirp, Retro pager, Keypad cascade, and Pocket pulse. These are not Nokia recordings or reproductions of Nokia melodies. Reminder alerts use notification channels; user channel settings override the app's sound/vibration choice.
 
-Users may import their own MP3, WAV, M4A/AAC, OGG, or FLAC clips through the Android file picker, subject to device decoding support. Limit imports to two seconds and 5 MB; reject empty, unreadable, corrupt, or unsupported files. Copy accepted files into app-private storage and persist metadata, so source-file deletion does not break saved tones. Expose imports in both interval and reminder tone selectors with preview and readable names; do not request broad storage permission or fetch audio dynamically.
+Users may import their own MP3, WAV, M4A/AAC, OGG, or FLAC clips through the Android file picker, subject to device decoding support. Limit imports to five seconds and 5 MB; reject empty, unreadable, corrupt, or unsupported files. Copy accepted files into app-private storage and persist metadata, so source-file deletion does not break saved tones. Expose imports in both interval and reminder tone selectors with preview and readable names; do not request broad storage permission or fetch audio dynamically.
+
+Add the 20 supplied two-second clips to the existing catalog. Only Soft bell, Focus tone, Completion chime, supplied Temple bell, and Aarti bells are protected from deletion. Reject deletion of tones referenced by a task, reminder, or default setting. Removing a bundled tone hides it rather than reducing installed package size.
+
+Share individual tasks via the Android share sheet and export/import multiple tasks through the document picker. A versioned archive carries every referenced tone, whether imported or bundled. Import creates new task and tone copies rather than replacing existing data. The archive is limited to 100 tasks, 200 tones, and 32 MB expanded; tone imports retain the five-second/5 MB limits.
 
 ## Timing and Platform Expectations
 

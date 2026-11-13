@@ -112,9 +112,9 @@ internal class TaskArchive(private val context: Context) {
         try {
             database.withTransaction {
                 val mapped = mutableMapOf<String, String>()
-                toneSpecs.forEachIndexed { index, tone ->
+                toneSpecs.forEach { tone ->
                     val safeName = tone.name.replace(Regex("[^A-Za-z0-9 _-]"), "_").take(60).ifBlank { "Tone" }
-                    val source = File(staging, "$index-$safeName.${tone.extension}")
+                    val source = File(staging, "$safeName.${tone.extension}")
                     source.writeBytes(tone.bytes)
                     val uri = FileProvider.getUriForFile(context, "${context.packageName}.tones", source)
                     val imported = library.import(uri)

@@ -8,6 +8,7 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.alarming.R
 import com.alarming.feature.reminders.ReminderDatabase
+import com.alarming.feature.reminders.ReminderTones
 import com.alarming.feature.intervaltimer.IntervalSlotEntity
 import com.alarming.feature.intervaltimer.IntervalTaskEntity
 import com.alarming.feature.intervaltimer.IntervalTaskStore
@@ -21,6 +22,20 @@ import org.junit.Test
 
 class ToneImportTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
+
+    @Test fun suppliedTonesAreAvailableAsPlayableResources() {
+        val supplied = ReminderTones.all.filter { it.id.startsWith("collection:") }
+        assertEquals(20, supplied.size)
+        supplied.forEach { tone ->
+            context.resources.openRawResourceFd(tone.resourceId).use { assertNotNull(it) }
+            val player = MediaPlayer()
+            try {
+                player.setDataSource(context, android.net.Uri.parse("android.resource://${context.packageName}/raw/${context.resources.getResourceEntryName(tone.resourceId)}"))
+                player.prepare()
+                assertEquals(2000, player.duration)
+            } finally { player.release() }
+        }
+    }
 
     @Test fun copiedToneSurvivesSourceRemovalAndHasReadableContentUri() = runBlocking {
         val directory = File(context.filesDir, "tones").apply { mkdirs() }
@@ -87,37 +102,40 @@ class ToneImportTest {
                     catch (_: IllegalArgumentException) { }
                 }
 
-                @Test fun protectedAndReferencedTonesCannotBeDeleted() = runBlocking {
-                    val directory = File(context.filesDir, "tones").apply { mkdirs() }
-                    val source = File(directory, "used-${UUID.randomUUID()}.wav")
-                    context.resources.openRawResource(R.raw.soft_bell).use { input -> source.outputStream().use { input.copyTo(it) } }
-                    val library = ToneLibrary(context)
-                    val store = IntervalTaskStore.get(context)
-                    var id: String? = null
-                    var taskId: Long? = null
-                    try {
-                        try { library.delete("Soft bell"); fail("Protected tone was deleted") }
-                        catch (_: IllegalArgumentException) { }
-                        id = library.import(FileProvider.getUriForFile(context, "${context.packageName}.tones", source)).id
-                        taskId = store.save(
-                            IntervalTaskEntity(name = "Tone deletion fixture", description = "", sharedSound = id,
-                                startSound = "Soft bell", completionSound = "Completion chime", startAlertEnabled = true,
-                                completionAlertEnabled = true, vibrationEnabled = false, createdAt = 0, updatedAt = 0),
-                            listOf(IntervalSlotEntity(0, 0, "Stage", 10, id)),
-                        )
-                        try { library.delete(id); fail("Referenced tone was deleted") }
-                        catch (_: IllegalArgumentException) { }
-                        assertNotNull(library.importedFile(id))
-                    } finally {
-                        taskId?.let { store.delete(it) }
-                        id?.let { library.delete(it) }
-                        source.delete()
-                    }
-                }
             }
         } finally {
             sources.forEach { it.delete() }
             importedId?.let { library.delete(it) }
+        }
+    }
+
+    @Test fun protectedAndReferencedTonesCannotBeDeleted() = runBlocking {
+        val directory = File(context.filesDir, "tones").apply { mkdirs() }
+        val source = File(directory, "used-${UUID.randomUUID()}.wav")
+        context.resources.openRawResource(R.raw.soft_bell).use { input -> source.outputStream().use { input.copyTo(it) } }
+        val library = ToneLibrary(context)
+        val store = IntervalTaskStore.get(context)
+        var id: String? = null
+        var taskId: Long? = null
+        try {
+            listOf("Soft bell", "Focus tone", "Completion chime", "collection:temple_bell", "collection:aarti_bells").forEach { protectedId ->
+                try { library.delete(protectedId); fail("Protected tone was deleted: $protectedId") }
+                catch (_: IllegalArgumentException) { }
+            }
+            id = library.import(FileProvider.getUriForFile(context, "${context.packageName}.tones", source)).id
+            taskId = store.save(
+                IntervalTaskEntity(name = "Tone deletion fixture", description = "", sharedSound = id,
+                    startSound = "Soft bell", completionSound = "Completion chime", startAlertEnabled = true,
+                    completionAlertEnabled = true, vibrationEnabled = false, createdAt = 0, updatedAt = 0),
+                listOf(IntervalSlotEntity(0, 0, "Stage", 10, id)),
+            )
+            try { library.delete(id); fail("Referenced tone was deleted") }
+            catch (_: IllegalArgumentException) { }
+            assertNotNull(library.importedFile(id))
+        } finally {
+            taskId?.let { store.delete(it) }
+            id?.let { library.delete(it) }
+            source.delete()
         }
     }
 

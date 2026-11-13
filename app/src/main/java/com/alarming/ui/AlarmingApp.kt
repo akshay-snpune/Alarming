@@ -247,7 +247,7 @@ private fun HomeScreen(
             ) {
                 Image(
                     painter = painterResource(com.alarming.R.drawable.ic_stagebell_mark),
-                    contentDescription = "StageBell water drop logo",
+                    contentDescription = "StageBell water bell logo",
                     modifier = Modifier.fillMaxSize().padding(5.dp),
                 )
             }
