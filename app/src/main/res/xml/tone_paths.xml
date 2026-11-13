@@ -1,0 +1,4 @@
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <files-path name="tones" path="tones/" />
+    <cache-path name="task_exports" path="task-exports/" />
+</paths>
