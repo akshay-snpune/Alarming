@@ -18,6 +18,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     val toneDeletionError = MutableStateFlow<String?>(null)
 
     fun setDarkTheme(enabled: Boolean) { viewModelScope.launch { store.setDarkTheme(enabled) } }
+    fun setColorTheme(theme: AppColorTheme) { viewModelScope.launch { store.setColorTheme(theme) } }
     fun setKeepScreenOn(enabled: Boolean) { viewModelScope.launch { store.setKeepScreenOn(enabled) } }
     fun setDefaultVibration(enabled: Boolean) { viewModelScope.launch { store.setDefaultVibration(enabled) } }
     fun setDefaultTone(slot: DefaultToneSlot, toneId: String) { viewModelScope.launch { store.setDefaultTone(slot, toneId) } }

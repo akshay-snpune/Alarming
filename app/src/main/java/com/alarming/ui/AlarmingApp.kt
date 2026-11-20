@@ -1,7 +1,6 @@
 package com.alarming.ui
 
 import android.app.Activity
-import android.graphics.Color as AndroidColor
 import android.media.AudioAttributes
 import android.media.SoundPool
 import android.os.Handler
@@ -93,7 +92,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
@@ -120,17 +121,18 @@ internal fun AlarmingApp(viewModel: PrototypeViewModel = viewModel()) {
     val reminders by remindersModel.records.collectAsStateWithLifecycle()
     val upcoming = reminders.filter { it.enabled && !it.completed && it.nextTrigger != null }.minByOrNull { it.nextTrigger!! }
 
-    AlarmingTheme(darkTheme = settings.darkTheme) {
+    AlarmingTheme(darkTheme = settings.darkTheme, colorTheme = settings.colorTheme) {
+        val colors = MaterialTheme.colorScheme
+        val useLightSystemBars = colors.background.luminance() > 0.5f
         SideEffect {
             val activity = context as? Activity
             activity?.window?.let { window ->
-                val isDark = settings.darkTheme
-                window.statusBarColor = if (isDark) AndroidColor.rgb(16, 29, 34) else AndroidColor.rgb(240, 247, 247)
-                window.navigationBarColor = if (isDark) AndroidColor.rgb(16, 29, 34) else AndroidColor.rgb(249, 253, 253)
-                window.decorView.systemUiVisibility = if (isDark) {
-                    0
-                } else {
+                window.statusBarColor = colors.background.toArgb()
+                window.navigationBarColor = colors.surface.toArgb()
+                window.decorView.systemUiVisibility = if (useLightSystemBars) {
                     View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+                } else {
+                    0
                 }
             }
         }

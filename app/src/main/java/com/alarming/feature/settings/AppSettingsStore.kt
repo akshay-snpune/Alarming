@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.map
 
 data class AppSettings(
     val darkTheme: Boolean = false,
+    val colorTheme: AppColorTheme = AppColorTheme.TEAL,
     val keepScreenOn: Boolean = true,
     val defaultStageTone: String = "Soft bell",
     val defaultStartTone: String = "Focus tone",
@@ -22,6 +23,18 @@ data class AppSettings(
     val defaultReminderTone: String = "Soft bell",
     val defaultVibration: Boolean = false,
 )
+
+enum class AppColorTheme(val label: String, val storageKey: String) {
+    TEAL("Teal", "teal"),
+    LAVENDER("Lavender", "lavender"),
+    ROSE("Rose", "rose"),
+    GRAPHITE("Graphite", "graphite");
+
+    companion object {
+        fun fromStorageKey(key: String?): AppColorTheme =
+            entries.firstOrNull { it.storageKey == key } ?: TEAL
+    }
+}
 
 enum class DefaultToneSlot { STAGE, START, COMPLETION, REMINDER }
 
@@ -35,6 +48,7 @@ class AppSettingsStore private constructor(context: Context) {
         .map(::toSettings)
 
     suspend fun setDarkTheme(enabled: Boolean) = store.edit { it[DARK_THEME] = enabled }
+    suspend fun setColorTheme(theme: AppColorTheme) = store.edit { it[COLOR_THEME] = theme.storageKey }
     suspend fun setKeepScreenOn(enabled: Boolean) = store.edit { it[KEEP_SCREEN_ON] = enabled }
     suspend fun setDefaultVibration(enabled: Boolean) = store.edit { it[DEFAULT_VIBRATION] = enabled }
     suspend fun setDefaultTone(slot: DefaultToneSlot, toneId: String) = store.edit { it[keyFor(slot)] = toneId }
@@ -45,6 +59,7 @@ class AppSettingsStore private constructor(context: Context) {
         val defaults = AppSettings()
         return AppSettings(
             darkTheme = prefs[DARK_THEME] ?: defaults.darkTheme,
+            colorTheme = AppColorTheme.fromStorageKey(prefs[COLOR_THEME]),
             keepScreenOn = prefs[KEEP_SCREEN_ON] ?: defaults.keepScreenOn,
             defaultStageTone = prefs[STAGE_TONE] ?: defaults.defaultStageTone,
             defaultStartTone = prefs[START_TONE] ?: defaults.defaultStartTone,
@@ -56,6 +71,7 @@ class AppSettingsStore private constructor(context: Context) {
 
     companion object {
         private val DARK_THEME = booleanPreferencesKey("dark_theme")
+        private val COLOR_THEME = stringPreferencesKey("color_theme")
         private val KEEP_SCREEN_ON = booleanPreferencesKey("keep_screen_on")
         private val DEFAULT_VIBRATION = booleanPreferencesKey("default_vibration")
         private val STAGE_TONE = stringPreferencesKey("default_stage_tone")

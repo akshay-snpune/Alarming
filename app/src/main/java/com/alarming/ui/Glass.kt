@@ -95,7 +95,7 @@ internal fun GlassBackground(modifier: Modifier = Modifier, content: @Composable
     val dark = isDarkGlass()
     val pools = listOf(
         Triple(Offset(0.1f, 0.05f), colors.secondary.copy(alpha = if (dark) 0.16f else 0.45f), 0.75f),
-        Triple(Offset(0.95f, 0.35f), Color(0xFF7FC8D8).copy(alpha = if (dark) 0.14f else 0.35f), 0.7f),
+        Triple(Offset(0.95f, 0.35f), colors.primary.copy(alpha = if (dark) 0.14f else 0.35f), 0.7f),
         Triple(Offset(0.2f, 0.95f), colors.tertiary.copy(alpha = if (dark) 0.1f else 0.18f), 0.8f),
     )
     Box(

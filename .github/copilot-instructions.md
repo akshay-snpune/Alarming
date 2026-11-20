@@ -21,5 +21,5 @@
 
 - Before starting a stage, state its scope, files, architecture choices, and verification plan. Implement only after the product/architecture plan has been reviewed.
 - Preserve existing behavior and user changes. Make focused edits, follow repository conventions, and do not leave placeholder controls or TODOs in completed features.
-- Add focused tests for timer/domain behavior and persistence/recovery before marking features complete. Keep `docs/PRODUCT_SPEC.md`, `docs/ARCHITECTURE.md`, and `docs/DEVELOPMENT_PROGRESS.md` aligned with actual decisions and implementation.
+- Add focused tests for timer/domain behavior and persistence/recovery before marking features complete. Keep `README.md` aligned with actual product decisions, architecture, development progress, and implementation.
 - Do not claim physical-device validation or APK delivery unless actually performed. Record Android-version/device limitations honestly.

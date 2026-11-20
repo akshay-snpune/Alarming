@@ -41,6 +41,7 @@ import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.LightMode
 import androidx.compose.material.icons.outlined.LibraryMusic
 import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material.icons.outlined.PlayCircle
 import androidx.compose.material.icons.outlined.Flag
 import androidx.compose.material.icons.outlined.ScreenLockPortrait
@@ -53,6 +54,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -95,6 +97,7 @@ internal fun SettingsScreen(model: SettingsViewModel, modifier: Modifier = Modif
     var previewError by remember { mutableStateOf<String?>(null) }
     val preview = rememberTonePreview { previewError = it }
     var choosingDefault by remember { mutableStateOf<DefaultToneSlot?>(null) }
+    var choosingTheme by remember { mutableStateOf(false) }
     var deleting by remember { mutableStateOf<ReminderTone?>(null) }
     var showBuiltIn by remember { mutableStateOf(false) }
 
@@ -131,6 +134,15 @@ internal fun SettingsScreen(model: SettingsViewModel, modifier: Modifier = Modif
                 checked = settings.darkTheme,
                 onCheckedChange = model::setDarkTheme,
             )
+            RowDivider()
+            SettingRow(
+                icon = Icons.Outlined.Palette,
+                title = "Color theme",
+                subtitle = "Choose a palette",
+                onClick = { choosingTheme = true },
+            ) {
+                Text(settings.colorTheme.label, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(end = 16.dp))
+            }
         }
 
         Spacer(Modifier.height(6.dp))
@@ -236,6 +248,41 @@ internal fun SettingsScreen(model: SettingsViewModel, modifier: Modifier = Modif
                     model.setDefaultTone(slot, id)
                     choosingDefault = null
                 }, showImportHint = false)
+                Spacer(Modifier.height(12.dp))
+            }
+        }
+    }
+
+    if (choosingTheme) {
+        ModalBottomSheet(
+            onDismissRequest = { choosingTheme = false },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
+        ) {
+            Column(
+                Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).navigationBarsPadding(),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                Text("Color theme", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.padding(bottom = 8.dp))
+                AppColorTheme.entries.forEach { theme ->
+                    SettingRow(
+                        icon = Icons.Outlined.Palette,
+                        title = theme.label,
+                        subtitle = if (theme == settings.colorTheme) "Selected" else "Choose this palette",
+                        onClick = {
+                            model.setColorTheme(theme)
+                            choosingTheme = false
+                        },
+                    ) {
+                        RadioButton(
+                            selected = theme == settings.colorTheme,
+                            onClick = {
+                                model.setColorTheme(theme)
+                                choosingTheme = false
+                            },
+                        )
+                    }
+                }
                 Spacer(Modifier.height(12.dp))
             }
         }
